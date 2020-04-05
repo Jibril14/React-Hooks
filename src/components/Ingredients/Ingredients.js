@@ -30,12 +30,16 @@ function Ingredients() {
             });
     }, []);
 **/
+
+    const filteredIngHandler = (filteredIngredient) => {
+        setUserIngredient(filteredIngredient);
+    };
     return (
         <div className="App">
             <IngredientForm onAddIngredient={addIngredientHandler} />
 
             <section>
-                <Search />
+                <Search onloadIngs={filteredIngHandler} />
                 <IngredientList
                     ingredients={userIngredients}
                     onRemoveItem={() => {}}
