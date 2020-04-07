@@ -5,7 +5,7 @@ import "./Search.css";
 
 const Search = React.memo((props) => {
     const [enteredSearch, setEnteredSearch] = useState([]);
-
+    const { onloadIngs } = props;
     useEffect(() => {
         const query =
             enteredSearch.length === 0
@@ -23,12 +23,10 @@ const Search = React.memo((props) => {
                     });
                 }
 
-                // props.onloadIngs(ingredientFromDb);
+                onloadIngs(ingredientFromDb);
             })
-            .catch((error) => {
-                console.log(error);
-            });
-    }, [enteredSearch]);
+            .catch((error) => {});
+    }, [enteredSearch, onloadIngs]);
     return (
         <section className="search">
             <Card>

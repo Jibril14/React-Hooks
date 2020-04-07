@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 import IngredientForm from "./IngredientForm";
 import IngredientList from "./IngredientList";
@@ -31,9 +31,9 @@ function Ingredients() {
     }, []);
 **/
 
-    const filteredIngHandler = (filteredIngredient) => {
+    const filteredIngHandler = useCallback((filteredIngredient) => {
         setUserIngredient(filteredIngredient);
-    };
+    }, []);
     return (
         <div className="App">
             <IngredientForm onAddIngredient={addIngredientHandler} />
