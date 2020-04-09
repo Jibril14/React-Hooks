@@ -3,9 +3,12 @@ import React, { useState, useEffect, useCallback } from "react";
 import IngredientForm from "./IngredientForm";
 import IngredientList from "./IngredientList";
 import Search from "./Search";
+import ErrorModal from "../UI/ErrorModal";
 
 function Ingredients() {
     const [userIngredients, setUserIngredient] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState();
 
     const addIngredientHandler = (ingredient) => {
         // setUserIngredient([{ id: Math.random(), ...ingredient }]);
@@ -37,22 +40,38 @@ function Ingredients() {
     }, []);
 
     const removeIngHandler = (ingId) => {
+        setIsLoading(true);
         fetch(`https://store.com/api/ingredient/ingredient/${ingId}.json`, {
             method: "DELETE"
             // At the time you might be using this, pls note that the api
             // might not be responsive
-        }).then((response) => {
-            setUserIngredient([
-                (previousIng) => {
-                    previousIng.filter((ingredient) => ingredient.id !== ingId);
-                }
-            ]);
-        });
+        })
+            .then((response) => {
+                setIsLoading(false);
+                setUserIngredient([
+                    (previousIng) => {
+                        previousIng.filter(
+                            (ingredient) => ingredient.id !== ingId
+                        );
+                    }
+                ]);
+            })
+            .catch((error) => {
+                setError(error.message);
+            });
+    };
+
+    const closeError = () => {
+        setError(null);
+        setIsLoading(false);
     };
 
     return (
         <div className="App">
-            <IngredientForm onAddIngredient={addIngredientHandler} />
+            <IngredientForm
+                onAddIngredient={addIngredientHandler}
+                loading={isLoading}
+            />
 
             <section>
                 <Search onloadIngs={filteredIngHandler} />
@@ -61,6 +80,9 @@ function Ingredients() {
                     onRemoveItem={removeIngHandler}
                 />
             </section>
+            {error ? (
+                <ErrorModal onClose={closeError}>{error}</ErrorModal>
+            ) : null}
         </div>
     );
 }
