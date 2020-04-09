@@ -8,7 +8,8 @@ function Ingredients() {
     const [userIngredients, setUserIngredient] = useState([]);
 
     const addIngredientHandler = (ingredient) => {
-        setUserIngredient([{ id: Math.random(), ...ingredient }]);
+        // setUserIngredient([{ id: Math.random(), ...ingredient }]);
+        setUserIngredient([{ id: 1, ...ingredient }]);
     };
 
     /**
@@ -34,6 +35,21 @@ function Ingredients() {
     const filteredIngHandler = useCallback((filteredIngredient) => {
         setUserIngredient(filteredIngredient);
     }, []);
+
+    const removeIngHandler = (ingId) => {
+        fetch(`https://store.com/api/ingredient/ingredient/${ingId}.json`, {
+            method: "DELETE"
+            // At the time you might be using this, pls note that the api
+            // might not be responsive
+        }).then((response) => {
+            setUserIngredient([
+                (previousIng) => {
+                    previousIng.filter((ingredient) => ingredient.id !== ingId);
+                }
+            ]);
+        });
+    };
+
     return (
         <div className="App">
             <IngredientForm onAddIngredient={addIngredientHandler} />
@@ -42,9 +58,8 @@ function Ingredients() {
                 <Search onloadIngs={filteredIngHandler} />
                 <IngredientList
                     ingredients={userIngredients}
-                    onRemoveItem={() => {}}
+                    onRemoveItem={removeIngHandler}
                 />
-                {/* Need to add list here! */}
             </section>
         </div>
     );
