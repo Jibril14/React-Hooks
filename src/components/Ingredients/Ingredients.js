@@ -1,18 +1,36 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useReducer } from "react";
 
 import IngredientForm from "./IngredientForm";
 import IngredientList from "./IngredientList";
 import Search from "./Search";
 import ErrorModal from "../UI/ErrorModal";
 
+const ingredientReducer = (currentIngredients, action) => {
+    switch (action.type) {
+        case "SET":
+            return action.ingredients;
+        case "ADD":
+            return [...currentIngredients, action.ingredient];
+        case "DELETE":
+            return currentIngredients.filter((ing) => ing.id !== action.id);
+        default:
+            throw new Error("should not get here!");
+    }
+};
+
 function Ingredients() {
-    const [userIngredients, setUserIngredient] = useState([]);
+    const [userIngredients, dispatch] = useReducer(ingredientReducer, []);
+    //const [userIngredients, setUserIngredient] = useState([]);
+
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState();
 
     const addIngredientHandler = (ingredient) => {
         // setUserIngredient([{ id: Math.random(), ...ingredient }]);
-        setUserIngredient([{ id: 1, ...ingredient }]);
+        dispatch({
+            type: "ADD",
+            ingredient: { id: Math.random(), ...ingredient }
+        });
     };
 
     /**
@@ -36,7 +54,8 @@ function Ingredients() {
 **/
 
     const filteredIngHandler = useCallback((filteredIngredient) => {
-        setUserIngredient(filteredIngredient);
+        // setUserIngredient(filteredIngredient);
+        dispatch({ type: "SET", ingredients: filteredIngredient });
     }, []);
 
     const removeIngHandler = (ingId) => {
@@ -48,13 +67,16 @@ function Ingredients() {
         })
             .then((response) => {
                 setIsLoading(false);
-                setUserIngredient([
+
+                /*  setUserIngredient([
                     (previousIng) => {
                         previousIng.filter(
                             (ingredient) => ingredient.id !== ingId
                         );
                     }
                 ]);
+                **/
+                dispatch({ type: "DELETE", id: ingId });
             })
             .catch((error) => {
                 setError(error.message);
